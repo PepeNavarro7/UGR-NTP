@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"base.convergencia"},{"l":"base.imagen"},{"l":"base.inicializacion"},{"l":"kmedias"},{"l":"visualizador"}];updateSearchResults();
