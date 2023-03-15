@@ -161,6 +161,15 @@ public class KMedias {
     */
    private List<Pixel> iterar(List<Pixel> centros){
       // se devuelve el resultado final
+      /**
+       * incrementar contador iter
+       * clasificar
+       * actualizar (nuevos centros)
+       * determinar la convergencia
+       * si hay convergencia -> resultado = centros nuevos
+       * else iterar (centros nuevos)
+       * return resultado
+       */
       return null;
    }
 

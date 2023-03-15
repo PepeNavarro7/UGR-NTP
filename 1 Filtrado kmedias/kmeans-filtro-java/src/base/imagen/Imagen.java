@@ -1,9 +1,6 @@
 package base.imagen;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * clase para almacenar y manejar imagenes en formato jpeg
@@ -82,20 +79,26 @@ public class Imagen {
      * convierte los datos en puntos
      * @return lista de objetos de clase Pixel para representar
      *          el contenido de la imagen
-     * NOTA: por implementar
+     * NOTA: por implementar -> Implementado
      */
     public List<Pixel> convertirPuntos(){
-        // se devuelva la lista de puntos
-        return null;
+        List<Pixel> lista = new ArrayList<>();
+        for (Integer i : this.datos){ // datos es un List<Integer>
+            // Por cada pixel codificado como entero, creo el pixel y lo guardo
+            Pixel pixel = new Pixel (i);
+            lista.add(pixel);
+        }
+        return lista;
     }
 
     /**
      * se determina el numero de colores de la imagen
      * @return numero de colores presentes en la imagen
-     * NOTA: por implementar
+     * NOTA: por implementar -> Implementado
      */
     public long obtenerNumeroColores(){
-        // se devuelve el numero de entradas
-        return 0L;
+        Set<Integer> set = new HashSet<>(); // Set no ordenado, nos da igual
+        set.addAll(this.datos);
+        return set.size();
     }
 }

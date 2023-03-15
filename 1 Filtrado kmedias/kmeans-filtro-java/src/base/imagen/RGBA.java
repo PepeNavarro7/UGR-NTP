@@ -68,7 +68,7 @@ public class RGBA {
      * @param color color del que extraer el valor del componente
      * @return valor extraido
      */
-    public static double obtenerAzul(int color){
+    private static double obtenerAzul(int color){
         return ((0x0000ff & color) >>> 0)*1.0 / 256;
     }
 

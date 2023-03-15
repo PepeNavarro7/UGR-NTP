@@ -27,6 +27,10 @@ public class MuestreoUniforme implements EstrategiaInicializacion {
     * @return pixels seleccionados como centros
     * NOTA: por implementar
     */
+   /**
+    * Se hacen k-1 grupos uniformemente repartidos, se calcula la chance de que un punto
+    * sea de cada grupo y se escogen aleatoriamente los centroides de cada grupo
+    */
    @Override
    public List<Pixel> seleccionar(int k, List<Pixel> puntos) {
       // se crea objeto de la clase Random

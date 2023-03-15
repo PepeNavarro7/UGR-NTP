@@ -16,12 +16,20 @@ public class Utilidades {
      *               la media (del centro)
      * @return pixel cuyas componentes son los valores medios
      * calculados
-     * NOTA: por implementar
+     * NOTA: por implementar -> Implementado
      */
     public static Pixel calcularMedia(List<Pixel> puntos){
-        // se devuelve el pixel que representa el centro
-        // del grupo de puntos pasado como argumento
-        return null;
+        double rojo = 0.0, verde = 0.0, azul = 0.0;
+        for(Pixel aux : puntos){
+            rojo += aux.obtenerComponente(ComponentesRGBA.ROJO);
+            verde += aux.obtenerComponente(ComponentesRGBA.VERDE);
+            azul += aux.obtenerComponente(ComponentesRGBA.AZUL);
+        }
+        rojo /= puntos.size();
+        verde /= puntos.size();
+        azul /= puntos.size();
+        Pixel pixel_medio = new Pixel(rojo,verde,azul);
+        return pixel_medio;
     }
 
     /**

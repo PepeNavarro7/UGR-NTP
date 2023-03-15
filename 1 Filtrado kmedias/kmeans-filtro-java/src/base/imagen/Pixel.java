@@ -104,11 +104,18 @@ public class Pixel implements Comparable<Pixel>{
      * argumento
      * @param centros lista de centros a considerar
      * @return centro mas cercano
-     * NOTA: por implementar
+     * NOTA: por implementar -> Implementado
      */
     public Pixel obtenerMasCercano(List<Pixel> centros){
-        // se devuelve el centro con minima distancia a this
-        return null;
+        int cercano = 0; // por defecto, el centro mas cercano es el primero
+        double distancia = this.distanciaCuadratica(centros.get(0));
+        for (int i = 1; i<centros.size(); ++i){ // podriamos usar un foreach, pero perdemos la claridad de saber el indice en cada momento
+            if(this.distanciaCuadratica(centros.get(i)) < distancia){
+                cercano = i; // si se encuentra una distancia menor, actualizamos cercano y distancia
+                distancia = this.distanciaCuadratica(centros.get(i));
+            }
+        }
+        return centros.get(cercano);
     }
 
     /**
