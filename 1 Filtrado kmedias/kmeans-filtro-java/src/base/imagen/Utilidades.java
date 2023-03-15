@@ -3,6 +3,7 @@ package base.imagen;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,6 +20,7 @@ public class Utilidades {
      * NOTA: por implementar -> Implementado
      */
     public static Pixel calcularMedia(List<Pixel> puntos){
+        // Calculo la media de cada una de las componentes
         double rojo = 0.0, verde = 0.0, azul = 0.0;
         for(Pixel aux : puntos){
             rojo += aux.obtenerComponente(ComponentesRGBA.ROJO);
@@ -37,10 +39,21 @@ public class Utilidades {
      * puntos de una coleccion
      * @param puntos lista de pixels a coniderar
      * @return lista con los minimos y maximos de toda la coleccion
-     * NOTA: por implementar
+     * NOTA: por implementar -> No sé si está bien implementado
      */
     public static List<Integer> obtenerMinimoMaximo(List<Pixel> puntos){
-        // se devuelve la lista final
+        List<Integer> lista = new ArrayList<>();
+        int max = Integer.MIN_VALUE, min=Integer.MAX_VALUE;
+        for(Pixel aux : puntos){
+            int indice = aux.obtenerIndice();
+            if (indice>max){
+                max = indice;
+            } else if (indice < min) {
+                min = indice;
+            }
+        }
+        lista.add(min);
+        lista.add(max);
         return null;
     }
 
@@ -53,8 +66,7 @@ public class Utilidades {
      * @return lista de pixels que pertenecen al intervalo
      * NOTA: por implementar
      */
-    public static List<Pixel> obtenerPuntosIntervalo(List<Pixel> puntos,
-                                                     double minimo, double maximo){
+    public static List<Pixel> obtenerPuntosIntervalo(List<Pixel> puntos, double minimo, double maximo){
         // se devuelve la lista
         return null;
     }
