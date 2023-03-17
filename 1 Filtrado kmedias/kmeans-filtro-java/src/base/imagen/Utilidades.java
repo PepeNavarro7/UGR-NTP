@@ -39,7 +39,7 @@ public class Utilidades {
      * puntos de una coleccion
      * @param puntos lista de pixels a coniderar
      * @return lista con los minimos y maximos de toda la coleccion
-     * NOTA: por implementar -> No sé si está bien implementado
+     * NOTA: por implementar -> Implementado
      */
     public static List<Integer> obtenerMinimoMaximo(List<Pixel> puntos){
         List<Integer> lista = new ArrayList<>();
@@ -54,7 +54,7 @@ public class Utilidades {
         }
         lista.add(min);
         lista.add(max);
-        return null;
+        return lista;
     }
 
     /**
@@ -64,11 +64,17 @@ public class Utilidades {
      * @param minimo valor minimo del intervalo
      * @param maximo valor maximo del intervalo
      * @return lista de pixels que pertenecen al intervalo
-     * NOTA: por implementar
+     * NOTA: por implementar -> Implementado
      */
     public static List<Pixel> obtenerPuntosIntervalo(List<Pixel> puntos, double minimo, double maximo){
-        // se devuelve la lista
-        return null;
+        List<Pixel> res = new ArrayList<>();
+        for (Pixel aux : puntos){
+            int valor = aux.obtenerIndice();
+            if(valor > minimo && valor < maximo){
+                res.add(aux);
+            }
+        }
+        return res;
     }
 
     /**
