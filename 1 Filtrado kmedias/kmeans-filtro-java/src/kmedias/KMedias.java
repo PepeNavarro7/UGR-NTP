@@ -178,11 +178,22 @@ public class KMedias {
     * pasados como argumento
     * @param centros centros a considerar
     * @return clasificacion de los pixels por cercania a los centros
-    * NOTA: por implementar
+    * NOTA: por implementar -> Implementado
     */
    private Map<Pixel, List<Pixel>> clasificar(List<Pixel> centros){
+      Map< Pixel,List<Pixel> > mapa = new HashMap<>();
+      for (Pixel pixel : this.pixels){
+         Pixel centroCercano = pixel.obtenerMasCercano(centros);
+         if(mapa.get(centroCercano) != null){
+            mapa.get(centroCercano).add(pixel);
+         } else {
+            List<Pixel> lista = new ArrayList<>();
+            lista.add(pixel);
+            mapa.put(centroCercano, lista);
+         }
+      }
       // se devuelve el mapa resultante
-      return null;
+      return mapa;
    }
 
    /**
