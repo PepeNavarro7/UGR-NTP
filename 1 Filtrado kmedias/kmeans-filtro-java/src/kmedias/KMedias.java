@@ -160,17 +160,17 @@ public class KMedias {
     * @return lista de nuevos centros
     */
    private List<Pixel> iterar(List<Pixel> centros){
-      // se devuelve el resultado final
-      /**
-       * incrementar contador iter
-       * clasificar
-       * actualizar (nuevos centros)
-       * determinar la convergencia
-       * si hay convergencia -> resultado = centros nuevos
-       * else iterar (centros nuevos)
-       * return resultado
-       */
-      return null;
+      //List<Pixel> resultado;
+      this.iteraciones++;
+      Map<Pixel,List<Pixel>> mapaCentros = this.clasificar(centros);
+      List<Pixel> nuevosCentros = this.actualizar(mapaCentros);
+      boolean converge = this.parada.convergencia(this.pixels,centros,nuevosCentros,this.iteraciones);
+      if (converge){
+         return nuevosCentros;
+      } else {
+         return iterar(nuevosCentros);
+      }
+      //return resultado;
    }
 
    /**
@@ -179,14 +179,18 @@ public class KMedias {
     * @param centros centros a considerar
     * @return clasificacion de los pixels por cercania a los centros
     * NOTA: por implementar -> Implementado
+    * Para cada pixel, se busca su centro mas cercano de la lista que se aporta
+    * y se guarda asociado a él en el map
     */
    private Map<Pixel, List<Pixel>> clasificar(List<Pixel> centros){
       Map< Pixel,List<Pixel> > mapa = new HashMap<>();
       for (Pixel pixel : this.pixels){
          Pixel centroCercano = pixel.obtenerMasCercano(centros);
          if(mapa.get(centroCercano) != null){
+            // Si el centro está en el map, se añade a la lista asociada
             mapa.get(centroCercano).add(pixel);
          } else {
+            // se crea la lista y se incluye
             List<Pixel> lista = new ArrayList<>();
             lista.add(pixel);
             mapa.put(centroCercano, lista);
@@ -200,13 +204,16 @@ public class KMedias {
     * actualizacion de la lista de centros obtenidos de acuerdo a
     * la clasificacion y centroides pasados como argumento
     * @param clasificacion mapa con clasificacion de centros
-    * @param centros lista de centros usados
     * @return nueva lista de centros
-    * NOTA: por implementar
+    * NOTA: por implementar -> Implementado
     */
-   private List<Pixel> actualizar(Map<Pixel, List<Pixel>> clasificacion, List<Pixel> centros){
-      // se devuelve la lista de nuevos centros
-      return null;
+   private List<Pixel> actualizar(Map<Pixel, List<Pixel>> clasificacion){
+      List<Pixel> nuevosCentros = new ArrayList<>();
+      for(List<Pixel> lista : clasificacion.values()){
+         Pixel pixel = Utilidades.calcularMedia(lista);
+         nuevosCentros.add(pixel);
+      }
+      return nuevosCentros;
    }
 
    /**
@@ -217,7 +224,13 @@ public class KMedias {
     * NOTA: por implementar
     */
    private Imagen aplicarFiltro(List<Pixel> centros){
-      // devuelve la imagen creada
-      return null;
+      Imagen resultado = new Imagen(this.imagen.obtenerAncho(),this.imagen.obtenerAlto());
+      for(int x=0; x<this.imagen.obtenerAncho(); ++x){
+         for(int y=0; y<this.imagen.obtenerAlto(); ++y){
+            Pixel nuevoColor = this.pixels.get(y*this.imagen.obtenerAncho()+x).obtenerMasCercano(centros);
+            resultado.actualizar(x,y,nuevoColor.obtenerIndice());
+         }
+      }
+      return resultado;
    }
 }

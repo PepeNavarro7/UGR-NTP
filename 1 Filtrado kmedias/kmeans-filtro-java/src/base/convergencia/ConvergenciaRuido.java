@@ -34,23 +34,19 @@ public class ConvergenciaRuido extends EstrategiaConvergencia {
    @Override
    public boolean convergencia(List<Pixel> datos, List<Pixel> centros1,
                                List<Pixel> centros2, int iter) {
-      boolean parada = false;
       double sennalTotal=0, ruidoTotal = 0;
       // condicion 1: que se haya alcanzado el maximo de iteraciones
-      if(iter > this.maxIter){
-         parada = true;
-      } else {
-         for(Pixel pixel : datos){
-            Pixel centroCercano = pixel.obtenerMasCercano(centros2);
-            sennalTotal+=pixel.calcularSennal();
-            ruidoTotal+= pixel.calcularRuido(centroCercano);
-         }
-         if( (sennalTotal / ruidoTotal) > this.umbral){
-            parada = true;
-         }
-      }
+      if(iter >= this.maxIter)
+         return true;
 
-      // se devuelve el resultado
-      return parada;
+      for(Pixel pixel : datos){
+         Pixel centroCercano = pixel.obtenerMasCercano(centros2);
+         sennalTotal+=pixel.calcularSennal();
+         ruidoTotal+= pixel.calcularRuido(centroCercano);
+      }
+      if( (sennalTotal / ruidoTotal) >= this.umbral)
+         return true;
+
+      return false;
    }
 }
