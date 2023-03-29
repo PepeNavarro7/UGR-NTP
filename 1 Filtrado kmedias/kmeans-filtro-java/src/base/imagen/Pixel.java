@@ -1,5 +1,6 @@
 package base.imagen;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -116,6 +117,13 @@ public class Pixel implements Comparable<Pixel>{
             }
         }
         return centros.get(cercano);
+       /* Pixel centroElegido = centros.get(0);
+        double distancia = this.distanciaCuadratica(centroElegido);
+        // el comparador los ordena en funcion a la distancia cuadratica con respecto al pixel
+        Comparator<Pixel> comparador = (p1, p2) ->
+                Double.compare(distanciaCuadratica(p1),distanciaCuadratica(p2));
+        centros.stream().sorted(comparador).findFirst().get();
+        return centroElegido;*/
     }
 
     /**

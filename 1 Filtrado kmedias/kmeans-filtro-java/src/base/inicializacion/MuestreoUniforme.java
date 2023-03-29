@@ -25,7 +25,7 @@ public class MuestreoUniforme implements EstrategiaInicializacion {
     *               mantiene para ofrecer una interfaz
     *               comun
     * @return pixels seleccionados como centros
-    * NOTA: por implementar
+    * NOTA: por implementar -> Implementado
     */
    /**
     * Se hacen k-1 grupos uniformemente repartidos, se calcula la chance de que un punto
@@ -33,15 +33,14 @@ public class MuestreoUniforme implements EstrategiaInicializacion {
     */
    @Override
    public List<Pixel> seleccionar(int k, List<Pixel> puntos) {
-
-      List<Pixel> seleccionados, marcas; // Listas de los k centros iniciales que se retorna, y las k marcas
-      List< List<Pixel> > pixelesIntervalos; // lista de k-1 intervalos
-      List<Double> chances; // chances de cada k-1 intervalo
-
-      marcas = eligeMarcas(k, puntos); // elijo las k marcas
-      pixelesIntervalos = pixelesPorIntervalo(puntos, marcas); // distribuyo los pixeles de cada intervalo
-      chances = calculaChances(pixelesIntervalos,puntos.size()); // calculo la chance de cada intervalo
-      seleccionados = eligeCentrosIniciales(pixelesIntervalos, chances, k); // y selecciono los centros
+      // elijo las k marcas uniformemente
+      List<Pixel> marcas = eligeMarcas(k, puntos);
+      // distribuyo los pixeles de cada intervalo
+      List<List<Pixel>> pixelesIntervalos = pixelesPorIntervalo(puntos, marcas);
+      // calculo la chance de cada intervalo
+      List<Double> chances = calculaChances(pixelesIntervalos,puntos.size());
+      // y selecciono los centros
+      List<Pixel> seleccionados = eligeCentrosIniciales(pixelesIntervalos, chances, k);
 
       return seleccionados;
    }
@@ -88,7 +87,7 @@ public class MuestreoUniforme implements EstrategiaInicializacion {
       for(int i=1; i<chances.size(); ++i){
          chances.set(i,chances.get(i)+chances.get(i-1));
       }
-
+      chances.set(chances.size()-1,1.0);
       return chances;
    }
 
@@ -111,8 +110,8 @@ public class MuestreoUniforme implements EstrategiaInicializacion {
             }
          }
          // Una vez tengo el tramo, escojo aleatoriamente un pixel de ese tramo
-         int pixelAleatorio = generador.nextInt() % pixelesIntervalos.get(tramo).size();
-         Pixel pixelElegido = pixelesIntervalos.get(tramo).get(pixelAleatorio);
+         int indiceAleatorio = generador.nextInt(pixelesIntervalos.get(tramo).size());
+         Pixel pixelElegido = pixelesIntervalos.get(tramo).get(indiceAleatorio);
          centrosSeleccionados.add(pixelElegido);
       }
 
