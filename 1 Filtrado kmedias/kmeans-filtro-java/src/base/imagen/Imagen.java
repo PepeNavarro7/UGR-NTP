@@ -1,6 +1,9 @@
 package base.imagen;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * clase para almacenar y manejar imagenes en formato jpeg
@@ -31,11 +34,13 @@ public class Imagen {
         this.datos = new ArrayList<>();
 
         // se inicializan todos los valores a 0
-        for(int i=0; i < ancho; i++){
+        /*for(int i=0; i < ancho; i++){
             for(int j=0; j < alto; j++){
                 datos.add(0);
             }
-        }
+        }*/
+        IntStream.range(0,ancho*alto)
+                .forEach(value -> datos.add(0));
     }
 
     /**
@@ -82,14 +87,19 @@ public class Imagen {
      * NOTA: por implementar -> Implementado
      */
     public List<Pixel> convertirPuntos(){
-        List<Pixel> lista = new ArrayList<>();
+        /*List<Pixel> lista = new ArrayList<>();
         for (Integer i : this.datos){ // datos es un List<Integer>
             // Por cada pixel codificado como entero, creo el pixel y lo guardo
             Pixel pixel = new Pixel (i);
             lista.add(pixel);
         }
-        return lista;
+        return lista;*/
+        // Convertimos un flujo de Integers en uno de Pixeles
+        return this.datos.stream()
+                .map(i -> new Pixel(i))
+                .collect(Collectors.toList());
     }
+
 
     /**
      * se determina el numero de colores de la imagen
