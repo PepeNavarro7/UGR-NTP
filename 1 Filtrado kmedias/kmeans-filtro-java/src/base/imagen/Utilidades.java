@@ -4,7 +4,10 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 
 /**
  * clase con metodos estaticos de utilidad
@@ -20,7 +23,7 @@ public class Utilidades {
      * NOTA: por implementar -> Implementado
      */
     public static Pixel calcularMedia(List<Pixel> puntos){
-        // Calculo la media de cada una de las componentes
+        /*// Calculo la media de cada una de las componentes
         double rojo = 0.0, verde = 0.0, azul = 0.0;
         for(Pixel aux : puntos){
             rojo += aux.obtenerComponente(ComponentesRGBA.ROJO);
@@ -31,7 +34,18 @@ public class Utilidades {
         verde /= puntos.size();
         azul /= puntos.size();
         Pixel pixel_medio = new Pixel(rojo,verde,azul);
-        return pixel_medio;
+        return pixel_medio;*/
+        // Creo un array de los valores del enumerado, y transformo cada valor en la media de los colores
+        List<Double> colores =
+                Arrays.stream( ComponentesRGBA.values() )
+                .map(color ->
+                        puntos.stream()
+                                .mapToDouble(pixel -> pixel.obtenerComponente(color))
+                                .average()
+                                .getAsDouble()
+                )
+                .collect(Collectors.toList());
+        return new Pixel(colores.get(0), colores.get(1), colores.get(2));
     }
 
     /**

@@ -95,9 +95,10 @@ public class Imagen {
         }
         return lista;*/
         // Convertimos un flujo de Integers en uno de Pixeles
-        return this.datos.stream()
+        List<Pixel> flujo = this.datos.stream()
                 .map(i -> new Pixel(i))
                 .collect(Collectors.toList());
+        return flujo;
     }
 
 
@@ -107,8 +108,12 @@ public class Imagen {
      * NOTA: por implementar -> Implementado
      */
     public long obtenerNumeroColores(){
-        Set<Integer> set = new HashSet<>(); // Set no ordenado, nos da igual
+        /*Set<Integer> set = new HashSet<>(); // Set no ordenado, nos da igual
         set.addAll(this.datos);
-        return set.size();
+        return set.size();*/
+        long recuento = this.datos.stream()
+                .distinct()
+                .count();
+        return recuento;
     }
 }
