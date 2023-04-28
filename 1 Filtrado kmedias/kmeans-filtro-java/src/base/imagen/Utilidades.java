@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
 
 /**
  * clase con metodos estaticos de utilidad
@@ -23,18 +24,6 @@ public class Utilidades {
      * NOTA: por implementar -> Implementado
      */
     public static Pixel calcularMedia(List<Pixel> puntos){
-        /*// Calculo la media de cada una de las componentes
-        double rojo = 0.0, verde = 0.0, azul = 0.0;
-        for(Pixel aux : puntos){
-            rojo += aux.obtenerComponente(ComponentesRGBA.ROJO);
-            verde += aux.obtenerComponente(ComponentesRGBA.VERDE);
-            azul += aux.obtenerComponente(ComponentesRGBA.AZUL);
-        }
-        rojo /= puntos.size();
-        verde /= puntos.size();
-        azul /= puntos.size();
-        Pixel pixel_medio = new Pixel(rojo,verde,azul);
-        return pixel_medio;*/
         // Creo un array de los valores del enumerado, y transformo cada valor en la media de los colores
         List<Double> colores =
                 Arrays.stream( ComponentesRGBA.values() )
@@ -57,17 +46,9 @@ public class Utilidades {
      */
     public static List<Integer> obtenerMinimoMaximo(List<Pixel> puntos){
         List<Integer> lista = new ArrayList<>();
-        int max = Integer.MIN_VALUE, min=Integer.MAX_VALUE;
-        for(Pixel aux : puntos){
-            int indice = aux.obtenerIndice();
-            if (indice>max){
-                max = indice;
-            } else if (indice < min) {
-                min = indice;
-            }
-        }
-        lista.add(min);
-        lista.add(max);
+        // hay que hacer el flujo 2 veces, no se puede reutilizar
+        lista.add(puntos.stream().mapToInt(pixel -> pixel.obtenerIndice()).min().getAsInt());
+        lista.add(puntos.stream().mapToInt(pixel -> pixel.obtenerIndice()).max().getAsInt());
         return lista;
     }
 
@@ -81,14 +62,12 @@ public class Utilidades {
      * NOTA: por implementar -> Implementado
      */
     public static List<Pixel> obtenerPuntosIntervalo(List<Pixel> puntos, double minimo, double maximo){
-        List<Pixel> res = new ArrayList<>();
-        for (Pixel aux : puntos){
-            int valor = aux.obtenerIndice();
-            if(valor > minimo && valor < maximo){
-                res.add(aux);
-            }
-        }
-        return res;
+        List<Pixel> lista = puntos.stream()
+                .map(punto -> punto.obtenerIndice())
+                .filter(indice -> indice > minimo && indice < maximo)
+                .map(indice -> new Pixel(indice))
+                .collect(Collectors.toList());
+        return lista;
     }
 
     /**
