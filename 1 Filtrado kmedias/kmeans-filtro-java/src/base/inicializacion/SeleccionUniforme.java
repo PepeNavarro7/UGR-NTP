@@ -5,6 +5,8 @@ import base.imagen.Utilidades;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * clase para la seleccion de puntos de forma uniforme
@@ -23,38 +25,16 @@ public class SeleccionUniforme implements EstrategiaInicializacion {
     */
    @Override
    public List<Pixel> seleccionar(int k, List<Pixel> puntos) {
-      List<Pixel> seleccionados = new ArrayList<>();
-
-      // se determinan los valores maximo y minimo de
-      // colores de los puntos
-      List<Integer> minMax = Utilidades.obtenerMinimoMaximo(puntos);
-
-      // se crea el punto inicial
-      int colorMinimo = minMax.get(0);
-      seleccionados.add(new Pixel(colorMinimo));
-
-      // se determinan los valores intermedios
-      int color = 0;
-      Pixel punto;
-      double incremento = (minMax.get(1) - minMax.get(0)) / (k - 1);
-      for(int i=1; i < (k-1); i++){
-         color = minMax.get(0) + (int)Math.round(incremento*i);
-
-         // convierte a componentes el color
-         punto = new Pixel(color);
-
-         // se agrega a la coleccion de seleccionados
-         seleccionados.add(punto);
-      }
-
-      // se agrega el correspondiente al maximo
-      color = minMax.get(1);
-      punto = new Pixel(color);
-
-      // se agrega a la coleccion
-      seleccionados.add(punto);
-
-      // se devuelve la lista de valores seleccionados
+      //Obtenemos el minimo y el maximo, y  calculamos el incremento
+      final List<Integer> minMax = Utilidades.obtenerMinimoMaximo(puntos);
+      final double incremento = (double)(minMax.get(1) - minMax.get(0)) / (k - 1);
+      // Partimos de un stream de 0 a k-2, y mapeamos cada i al pixel correspondiente
+      List<Pixel> seleccionados = IntStream.range(0, (k - 1))
+              .boxed()
+              .map(i -> new Pixel(minMax.get(0) + (int) Math.round(incremento * i)))
+              .collect(Collectors.toList());
+      //Añadimos el ultimo pixel, el maximo
+      seleccionados.add(new Pixel(minMax.get(1)));
       return seleccionados;
    }
 }

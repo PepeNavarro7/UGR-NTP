@@ -4,6 +4,8 @@ import base.imagen.Pixel;
 import base.imagen.Utilidades;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * clase que implementa el muestreo uniforme para la
@@ -33,7 +35,7 @@ public class MuestreoUniforme implements EstrategiaInicializacion {
     */
    @Override
    public List<Pixel> seleccionar(int k, List<Pixel> puntos) {
-      // elijo las k marcas uniformemente
+      /*// elijo las k marcas uniformemente
       List<Pixel> marcas = eligeMarcas(k, puntos);
       // distribuyo los pixeles de cada intervalo
       List<List<Pixel>> pixelesIntervalos = pixelesPorIntervalo(puntos, marcas);
@@ -42,11 +44,20 @@ public class MuestreoUniforme implements EstrategiaInicializacion {
       // y selecciono los centros
       List<Pixel> seleccionados = eligeCentrosIniciales(pixelesIntervalos, chances, k);
 
-      return seleccionados;
+      return seleccionados;*/
+      final List<Integer> minMax = Utilidades.obtenerMinimoMaximo(puntos);
+      final double incremento = (double)( minMax.get(1) - minMax.get(0) ) / (k - 1);
+      List<Pixel> marcas = IntStream.range(0, (k - 1))
+              .boxed()
+              .map(i -> new Pixel(minMax.get(0) + (int) Math.round(incremento * i)))
+              .collect(Collectors.toList());
+      //Añadimos el ultimo pixel, el maximo
+      marcas.add(new Pixel(minMax.get(1)));
+      return marcas;
    }
 
    private List<Pixel> eligeMarcas(int numMarcas, List<Pixel> puntos) {
-      List<Pixel> marcas = new ArrayList<>();
+      /*List<Pixel> marcas = new ArrayList<>();
       List<Integer> minMax = Utilidades.obtenerMinimoMaximo(puntos);
       double incremento = (double)( minMax.get(1) - minMax.get(0) ) / (numMarcas - 1);
       // Para 1000 puntos y 5 marcas, 0 250 500 750 1000, incrementos de (1000-0)/4=250
@@ -60,7 +71,8 @@ public class MuestreoUniforme implements EstrategiaInicializacion {
       }
       marcas.add(new Pixel(minMax.get(1))); // Ultima marca, pixel maximo
 
-      return marcas;
+      return marcas;*/
+
    }
 
    private List<List<Pixel>> pixelesPorIntervalo(List<Pixel> puntos, List<Pixel> marcas) {

@@ -5,6 +5,9 @@ import base.imagen.Pixel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * implementacion de la seleccion mediante muestreo aleatorio
@@ -18,23 +21,15 @@ public class MuestreoAleatorio implements EstrategiaInicializacion {
      */
     @Override
     public List<Pixel> seleccionar(int k, List<Pixel> puntos) {
-        ArrayList<Pixel> seleccionados = new ArrayList<>();
-
-        // se seleccionan k puntos al azar
-        ArrayList<Integer> indices = new ArrayList<>();
-        for(int i = 0; i < puntos.size(); i++){
-            indices.add(i);
-        }
-
-        // se barajan los indices
-        Collections.shuffle(indices);
-
-        // se seleccionan los puntos de los k primeros indices
-        for(int i=0; i < k; i++){
-            seleccionados.add(puntos.get(indices.get(i)));
-        }
-
-        // se devuelve la lista de puntos seleccionados
-        return seleccionados;
+        // obtenemos los indices de los puntos
+        List<Integer> indices = puntos.stream()
+                .map(punto -> punto.obtenerIndice())
+                .collect(Collectors.toList());
+        Collections.shuffle(indices); // mezclamos
+        // seleccionamos los k primeros y los convertimos a pixel de nuevo
+        Stream<Pixel> seleccionados = indices.stream()
+                .limit(k)
+                .map(indice -> new Pixel(indice));
+        return seleccionados.collect(Collectors.toList());
     }
 }
