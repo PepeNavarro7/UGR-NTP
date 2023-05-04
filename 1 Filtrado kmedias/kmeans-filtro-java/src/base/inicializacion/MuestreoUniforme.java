@@ -4,8 +4,11 @@ import base.imagen.Pixel;
 import base.imagen.Utilidades;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * clase que implementa el muestreo uniforme para la
@@ -30,103 +33,91 @@ public class MuestreoUniforme implements EstrategiaInicializacion {
     * NOTA: por implementar -> Implementado
     */
    /**
-    * Se hacen k-1 grupos uniformemente repartidos, se calcula la chance de que un punto
+    * Se hacen k (inicialmente pensé que eran k-1 grupos) grupos uniformemente
+    * repartidos, se calcula la chance de que un punto
     * sea de cada grupo y se escogen aleatoriamente los centroides de cada grupo
     */
    @Override
    public List<Pixel> seleccionar(int k, List<Pixel> puntos) {
-      /*// elijo las k marcas uniformemente
-      List<Pixel> marcas = eligeMarcas(k, puntos);
-      // distribuyo los pixeles de cada intervalo
-      List<List<Pixel>> pixelesIntervalos = pixelesPorIntervalo(puntos, marcas);
+
+      // distribuyo los N pixeles de cada k intervalo, delimitados por las k+1 marcas
+      Map< Integer,List<Pixel> > porIntervalo = pixelesPorIntervalo(puntos, k);
       // calculo la chance de cada intervalo
-      List<Double> chances = calculaChances(pixelesIntervalos,puntos.size());
+      List<Double> distribucion = calculaChances(porIntervalo);
+      // Acumulo la chance
+      List<Double> acumulada = acumulaDistribucion(distribucion);
       // y selecciono los centros
-      List<Pixel> seleccionados = eligeCentrosIniciales(pixelesIntervalos, chances, k);
+      List<Pixel> seleccionados = eligeCentrosIniciales(porIntervalo, acumulada, k);
 
-      return seleccionados;*/
+      return seleccionados;
+   }
+
+
+
+   private Map< Integer,List<Pixel> > pixelesPorIntervalo(List<Pixel> puntos, int intervalos) {
+      // Para 1000 puntos, 4 intervalos, 5 marcas, 0 250 500 750 1000, incrementos de (1000-0)/4=250
+      // Para 500 puntos, 2 intervalos, 3 marcas, 250 500 750, incrementos de (750-250)/2=250
       final List<Integer> minMax = Utilidades.obtenerMinimoMaximo(puntos);
-      final double incremento = (double)( minMax.get(1) - minMax.get(0) ) / (k - 1);
-      List<Pixel> marcas = IntStream.range(0, (k - 1))
+      System.out.println("Minimo:"+minMax.get(0)+" // Maximo:"+minMax.get(1));
+      final int incremento = ( minMax.get(1) - minMax.get(0) ) / (intervalos);
+      System.out.println(incremento);
+      return IntStream.range(0, intervalos)
               .boxed()
-              .map(i -> new Pixel(minMax.get(0) + (int) Math.round(incremento * i)))
-              .collect(Collectors.toList());
-      //Añadimos el ultimo pixel, el maximo
-      marcas.add(new Pixel(minMax.get(1)));
-      return marcas;
+              // Creamos un map con los enteros inciales como key, y la lista de pixeles como value
+              .collect(Collectors.toMap(
+                      Function.identity(),
+                      indice -> { int izq = minMax.get(0) + incremento * indice;
+                         int der = izq + incremento;
+                         System.out.println("Min->"+izq+" Max->"+der);
+                         List<Pixel> aux = Utilidades.obtenerPuntosIntervalo(puntos, izq, der);
+                         System.out.println("puntos->"+aux.size());
+                         return  aux; }
+              ) );
    }
 
-   private List<Pixel> eligeMarcas(int numMarcas, List<Pixel> puntos) {
-      /*List<Pixel> marcas = new ArrayList<>();
-      List<Integer> minMax = Utilidades.obtenerMinimoMaximo(puntos);
-      double incremento = (double)( minMax.get(1) - minMax.get(0) ) / (numMarcas - 1);
-      // Para 1000 puntos y 5 marcas, 0 250 500 750 1000, incrementos de (1000-0)/4=250
 
-      marcas.add(new Pixel(minMax.get(0)) ); // La primera marca es el minimo
-      // Calculamos las marcas intermedias, aumentando el indice incremento a incremento
-      for(int i=1; i<numMarcas-1; ++i){
-         int indice = minMax.get(0) + (int)Math.round(incremento * i);
-         // cada marca será un nuevo pixel (que no tiene por qué existir en la imagen)
-         marcas.add(new Pixel(indice));
-      }
-      marcas.add(new Pixel(minMax.get(1))); // Ultima marca, pixel maximo
 
-      return marcas;*/
-
-   }
-
-   private List<List<Pixel>> pixelesPorIntervalo(List<Pixel> puntos, List<Pixel> marcas) {
-      List<List<Pixel>> pixelesIntervalos = new ArrayList<>();
-
-      for(int i=0; i<marcas.size()-1; ++i){ // marcas.size-1 == k-1 == los intervalos que hay (entre marca.k y marca.k+1)
-         // encuentro los pixeles que hay en el intervalo entre una marca y la siguiente
-         double desde=marcas.get(i).obtenerIndice(), hasta=marcas.get(i+1).obtenerIndice();
-         List<Pixel> aux = Utilidades.obtenerPuntosIntervalo(puntos, desde, hasta);
-         pixelesIntervalos.add(aux);
-      }
-
-      return pixelesIntervalos;
-   }
-
-   private List<Double> calculaChances(List<List<Pixel>> pixelesIntervalos, int total) {
-      List<Double> chances = new ArrayList<>();
-
+   private List<Double> calculaChances(Map< Integer,List<Pixel> > pixelesIntervalos) {
       // calculo las chances de cada intervalo (tam del intervalo / tam total)
-      for(List<Pixel> intervalo : pixelesIntervalos){
-         chances.add((double)intervalo.size() / total);
-      }
-      // Hago que la chance se arrastre, si es .25 .10 .50 .15, se transforma a .25 .35 .85 1.00
-      for(int i=1; i<chances.size(); ++i){
-         chances.set(i,chances.get(i)+chances.get(i-1));
-      }
-      chances.set(chances.size()-1,1.0);
+      long total = pixelesIntervalos.values().stream().flatMap(List::stream).count();
+
+      List<Double> chances =
+              pixelesIntervalos.values()
+              .stream()
+              .map(lista -> ((double) lista.size() / total))
+              .collect(Collectors.toList());
+      System.out.println("Chances"+chances);
       return chances;
    }
+   private List<Double> acumulaDistribucion(List<Double> chances) {
+      return IntStream.range(0, chances.size())
+              .boxed()
+              .map(indice -> chances.stream().limit(indice+1))
+              .map(flujo -> flujo.reduce(0.0, (x, y) -> x + y))
+              .collect(Collectors.toList());
+   }
 
-   private List<Pixel> eligeCentrosIniciales(List<List<Pixel>> pixelesIntervalos, List<Double> chances, int numCentros) {
-      Random generador = new Random(); // se crea objeto de la clase Random
-      List<Pixel> centrosSeleccionados = new ArrayList<>();
-
-      // Elegimos los pixeles que serviran de centroides iniciales
-      for(int i=0; i<numCentros; ++i){
-         double chance = generador.nextDouble(); // genero chance entre 0.0 y 1.0
-         int tramo = 0;
-         boolean encontrado = false;
-
-         // Encuentro el tramo del que va a salir el pixelElegido
-         while (!encontrado){
-            if(chance < chances.get(tramo)){
-               encontrado = true;
-            } else {
-               tramo++;
-            }
-         }
-         // Una vez tengo el tramo, escojo aleatoriamente un pixel de ese tramo
-         int indiceAleatorio = generador.nextInt(pixelesIntervalos.get(tramo).size());
-         Pixel pixelElegido = pixelesIntervalos.get(tramo).get(indiceAleatorio);
-         centrosSeleccionados.add(pixelElegido);
-      }
-
+   private List<Pixel> eligeCentrosIniciales(Map< Integer,List<Pixel> > pixelesIntervalos, List<Double> chances, int numCentros) {
+      Random generador = new Random();
+      // Partimos de un rango igual al numero de centros que se deben seleccionar
+      List<Pixel> centrosSeleccionados =
+              IntStream.range(0, numCentros)
+              .boxed()
+      // De cada punto, sacamos un rand, y con ese rand calculamos en qué intervalo va a estar el punto
+              .map(indice -> generador.nextDouble())
+              .map(chance -> {
+                 for (int intervalo = 0; ; intervalo++)
+                    if (chance < chances.get(intervalo))
+                       return intervalo;
+              })
+      // Y sabiendo el tramo, cogemos un pixel aleatorio de ESE tramo
+              .map(tramo -> {
+                 int indiceAleatorio = generador.nextInt(
+                         pixelesIntervalos.get(tramo).size()
+                 );
+                 return pixelesIntervalos.get(tramo).get(indiceAleatorio);
+              } )
+              .collect(Collectors.toList());
       return centrosSeleccionados;
    }
 }

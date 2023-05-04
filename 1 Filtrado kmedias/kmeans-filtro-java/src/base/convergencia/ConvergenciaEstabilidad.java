@@ -3,6 +3,7 @@ package base.convergencia;
 import base.imagen.Pixel;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * calculo de convergencia considerando unicamente los centros
@@ -32,31 +33,22 @@ public class ConvergenciaEstabilidad extends EstrategiaConvergencia{
     */
    public boolean convergencia(List<Pixel> datos, List<Pixel> centros1,
                                List<Pixel> centros2, int iter) {
-      boolean parada = false;
-
       // condicion 1: que se haya alcanzado el maximo de iteraciones
       if(iter > maxIter){
-         parada = true;
-      }
-      else{
-         // en caso contrario, se va calculando la distancia entre
-         // centros consecutivos
-         double distancia = 0;
-         for(int i=0; i < centros1.size(); i++){
-            Pixel centro1 = centros1.get(i);
-            Pixel centro2 = centros2.get(i);
-
-            // se calcula la distancia
-            distancia += centro1.distanciaCuadratica(centro2);
-         }
-
-         // se comprueba ahora la segunda condicion
-         if(distancia > umbral){
-            parada = true;
-         }
+         return true;
       }
 
-      // se devuelve el valor de parada
-      return parada;
+      // en caso contrario, se va calculando la distancia entre
+      // centros consecutivos
+      double distancia =
+              IntStream.range(0, centros1.size())
+              .boxed()
+              .map(indice -> centros1.get(indice)
+                      .distanciaCuadratica( centros2.get(indice) )
+              )
+              .reduce(0.0,(x,y)->x+y);
+
+      // se comprueba ahora la segunda condicion
+      return distancia < umbral;
    }
 }
