@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * clase para implementar la funcionalidad del algoritmo de
@@ -183,21 +186,9 @@ public class KMedias {
     * y se guarda asociado a él en el map
     */
    private Map<Pixel, List<Pixel>> clasificar(List<Pixel> centros){
-      Map< Pixel,List<Pixel> > mapa = new HashMap<>();
-      for (Pixel pixel : this.pixels){
-         Pixel centroCercano = pixel.obtenerMasCercano(centros);
-         if(mapa.get(centroCercano) != null){
-            // Si el centro está en el map, se añade a la lista asociada
-            mapa.get(centroCercano).add(pixel);
-         } else {
-            // se crea la lista y se incluye
-            List<Pixel> lista = new ArrayList<>();
-            lista.add(pixel);
-            mapa.put(centroCercano, lista);
-         }
-      }
-      // se devuelve el mapa resultante
-      return mapa;
+      return this.pixels.stream()
+              .collect(Collectors.groupingBy(
+                      pixel -> pixel.obtenerMasCercano(centros) ) );
    }
 
    /**
@@ -208,12 +199,10 @@ public class KMedias {
     * NOTA: por implementar -> Implementado
     */
    private List<Pixel> actualizar(Map<Pixel, List<Pixel>> clasificacion){
-      List<Pixel> nuevosCentros = new ArrayList<>();
-      for(List<Pixel> lista : clasificacion.values()){
-         Pixel pixel = Utilidades.calcularMedia(lista);
-         nuevosCentros.add(pixel);
-      }
-      return nuevosCentros;
+      return clasificacion.values()
+              .stream()
+              .map(lista -> Utilidades.calcularMedia(lista))
+              .collect(Collectors.toList());
    }
 
    /**
@@ -225,12 +214,12 @@ public class KMedias {
     */
    private Imagen aplicarFiltro(List<Pixel> centros){
       Imagen resultado = new Imagen(this.imagen.obtenerAncho(),this.imagen.obtenerAlto());
-      for(int x=0; x<this.imagen.obtenerAncho(); ++x){
-         for(int y=0; y<this.imagen.obtenerAlto(); ++y){
+      IntStream.range(0,this.imagen.obtenerAncho()).forEach(x -> {
+         IntStream.range(0,this.imagen.obtenerAlto()).forEach(y -> {
             Pixel nuevoColor = this.pixels.get(y*this.imagen.obtenerAncho()+x).obtenerMasCercano(centros);
             resultado.actualizar(x,y,nuevoColor.obtenerIndice());
-         }
-      }
+         } );
+      } );
       return resultado;
    }
 }

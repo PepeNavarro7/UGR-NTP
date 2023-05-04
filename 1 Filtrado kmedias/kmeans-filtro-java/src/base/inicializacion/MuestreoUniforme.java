@@ -58,9 +58,7 @@ public class MuestreoUniforme implements EstrategiaInicializacion {
       // Para 1000 puntos, 4 intervalos, 5 marcas, 0 250 500 750 1000, incrementos de (1000-0)/4=250
       // Para 500 puntos, 2 intervalos, 3 marcas, 250 500 750, incrementos de (750-250)/2=250
       final List<Integer> minMax = Utilidades.obtenerMinimoMaximo(puntos);
-      System.out.println("Minimo:"+minMax.get(0)+" // Maximo:"+minMax.get(1));
       final int incremento = ( minMax.get(1) - minMax.get(0) ) / (intervalos);
-      System.out.println(incremento);
       return IntStream.range(0, intervalos)
               .boxed()
               // Creamos un map con los enteros inciales como key, y la lista de pixeles como value
@@ -68,10 +66,7 @@ public class MuestreoUniforme implements EstrategiaInicializacion {
                       Function.identity(),
                       indice -> { int izq = minMax.get(0) + incremento * indice;
                          int der = izq + incremento;
-                         System.out.println("Min->"+izq+" Max->"+der);
-                         List<Pixel> aux = Utilidades.obtenerPuntosIntervalo(puntos, izq, der);
-                         System.out.println("puntos->"+aux.size());
-                         return  aux; }
+                         return  Utilidades.obtenerPuntosIntervalo(puntos, izq, der); }
               ) );
    }
 
